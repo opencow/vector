@@ -37,6 +37,18 @@ generated: components: sinks: azure_blob: configuration: {
 			type: bool: {}
 		}
 	}
+	api_version: {
+		description: """
+			The Azure Blob Storage service API version to use for requests.
+
+			This sets the `x-ms-version` request header. If unset, the version selected by the Azure
+			SDK is used. Setting an older version can be useful with Azure Stack or other storage
+			services that do not support the SDK's default version. The configured version must support
+			every operation and option used by this sink.
+			"""
+		required: false
+		type: string: examples: ["2021-08-06"]
+	}
 	auth: {
 		description: "Azure service principal authentication."
 		required:    false
@@ -644,12 +656,18 @@ generated: components: sinks: azure_blob: configuration: {
 
 					When set to `single`, only the last non-bare value of tags are displayed with the
 					metric. When set to `full`, all metric tags are exposed as separate assignments.
+					When set to `auto`, tag values are encoded using their underlying shape.
 					"""
 				relevant_when: "codec = \"json\" or codec = \"text\""
 				required:      false
 				type: string: {
 					default: "single"
 					enum: {
+						auto: """
+															Tag values are exposed using their underlying shape: single-value tags as strings,
+															multi-value tags as arrays. A length-1 array round-trips as a scalar; use `Full` to
+															force array shape.
+															"""
 						full: "All tags are exposed as arrays of either string or null values."
 						single: """
 															Tag values are exposed as single strings, the same as they were before this config
